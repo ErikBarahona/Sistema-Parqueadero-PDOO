@@ -1,0 +1,131 @@
+@startuml
+' Diagrama multisedes: las ocho clases originales + coordinador.
+' Usuarios, clientes y vehículos globales; espacios, tarifas, ingresos y facturas por sede.
+left to right direction
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam shadowing false
+
+class Parqueadero {
+  - id_parqueadero: int
+  - razon_social: str
+  - ubicacion: str
+  - capacidad: int
+  - telefono: str
+  - correo: str
+  + registrarEspacio()
+  + actualizarEspacio()
+  + consultarDisponibilidad()
+  + generarReporte()
+}
+class Espacio {
+  - id_espacio: int
+  - codigo: str
+  - seccion: str
+  - estado: str
+  - tipo_vehiculo: str
+  + asignarEspacio()
+  + liberarEspacio()
+  + consultarDisponibilidad()
+  + actualizarEstado()
+}
+class Usuario {
+  - id_usuario: int
+  - nombre: str
+  - apellido: str
+  - cedula: str
+  - correo: str
+  - rol: str
+  + crearusuario()
+  + iniciarSesion()
+  + cerrarSesion()
+}
+class Cliente {
+  - id_cliente: int
+  - nombre: str
+  - apellido: str
+  - cedula: str
+  - telefono: str
+  - correo: str
+  + registrarCliente()
+  + agregarVehiculo()
+  + consultarVehiculos()
+}
+class Vehiculo {
+  - id_vehiculo: int
+  - placa: str
+  - marca: str
+  - color: str
+  - tipo_vehiculo: str
+  + validarPlaca()
+  + actualizarDatos()
+}
+class Tarifa {
+  - id_tarifa: int
+  - tipo_vehiculo: str
+  - precio_hora: int
+  - precio_dia: int
+  - fecha_vigencia: date
+  + calcularCosto()
+  + validarVigencia()
+  + obtenerTarifaPorTipo()
+}
+class Ingreso {
+  - id_ingreso: int
+  - entrada: datetime
+  - salida: datetime
+  - tiempo: float
+  + registrarIngreso()
+  + registrarSalida()
+  + calcularTiempo()
+  + consultarHistorial()
+}
+class Factura {
+  - id_factura: int
+  - fecha: datetime
+  - total: int
+  - metodo_pago: str
+  - fecha_pago: datetime
+  + generarFactura()
+  + registrarPago()
+  + imprimirFactura()
+}
+class SistemaParqueadero {
+  - archivo: Path
+  - parqueaderos: list[Parqueadero]
+  - id_parqueadero_activo: int
+  + crearParqueadero()
+  + seleccionarParqueadero()
+  + resumenParqueaderos()
+  + registrarEspacio()
+  + cambiarEstadoEspacio()
+  + registrarCliente()
+  + registrarVehiculo()
+  + registrarTarifa()
+  + registrarIngreso()
+  + registrarSalida()
+  + registrarPago()
+  + obtenerReporte()
+  + exportarHistorialCSV()
+  + guardar()
+  + cargar()
+}
+
+Parqueadero "1" o-- "0..*" Espacio : tiene
+Parqueadero "1" o-- "0..*" Tarifa : define
+Parqueadero "1" o-- "0..*" Ingreso : registra
+Parqueadero "1" o-- "0..*" Factura : emite
+SistemaParqueadero "1" o-- "0..*" Usuario : usuarios globales
+Cliente "0..1" -- "0..*" Vehiculo : posee
+Ingreso "0..*" --> "1" Usuario : registrado por
+Ingreso "0..*" --> "1" Vehiculo : corresponde a
+Ingreso "0..*" --> "1" Espacio : ocupa
+Ingreso "0..*" --> "1" Tarifa : utiliza
+Ingreso "1" --> "0..1" Factura : origina
+SistemaParqueadero "1" o-- "0..*" Parqueadero : administra
+SistemaParqueadero ..> Cliente
+SistemaParqueadero ..> Vehiculo
+SistemaParqueadero ..> Tarifa
+SistemaParqueadero ..> Ingreso
+SistemaParqueadero ..> Factura
+@enduml
